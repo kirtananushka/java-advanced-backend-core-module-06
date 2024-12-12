@@ -1,37 +1,94 @@
 package com.epam.ld.module2.testing;
 
-
 import com.epam.ld.module2.testing.template.Template;
 import com.epam.ld.module2.testing.template.TemplateEngine;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * The type Messenger.
  */
 public class Messenger {
-    private MailServer mailServer;
-    private TemplateEngine templateEngine;
+   private final MailServer mailServer;
+   private final TemplateEngine templateEngine;
+   private String inputFile;
+   private String outputFile;
 
-    /**
-     * Instantiates a new Messenger.
-     *
-     * @param mailServer     the mail server
-     * @param templateEngine the template engine
-     */
-    public Messenger(MailServer mailServer,
-                     TemplateEngine templateEngine) {
-        this.mailServer = mailServer;
-        this.templateEngine = templateEngine;
-    }
+   /**
+    * Constructor for Messenger
+    *
+    * @param mailServer     mail server instance
+    * @param templateEngine template engine instance
+    */
+   public Messenger(MailServer mailServer, TemplateEngine templateEngine) {
+      this.mailServer = mailServer;
+      this.templateEngine = templateEngine;
+   }
 
-    /**
-     * Send message.
-     *
-     * @param client   the client
-     * @param template the template
-     */
-    public void sendMessage(Client client, Template template) {
-        String messageContent =
-            templateEngine.generateMessage(template, client);
-        mailServer.send(client.getAddresses(), messageContent);
-    }
+   /**
+    * Sets the input and output files for file mode
+    *
+    * @param inputFile  path to input file
+    * @param outputFile path to output file
+    */
+   public void setIOFiles(String inputFile, String outputFile) {
+      this.inputFile = inputFile;
+      this.outputFile = outputFile;
+   }
+
+   /**
+    * Send message to specified client.
+    *
+    * @param client   client to receive message
+    * @param template template to be processed
+    */
+   public void sendMessage(Client client, Template template) {
+      try {
+         String input;
+         String messageContent;
+
+         if (isFileMode()) {
+            input = readFile(inputFile);
+            template.addVariable("input", input);
+            messageContent = templateEngine.generateMessage(template, client);
+            writeFile(outputFile, messageContent);
+         } else {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+               input = reader.readLine();
+               template.addVariable("input", input);
+               messageContent = templateEngine.generateMessage(template, client);
+               System.out.println(messageContent);
+            }
+         }
+
+         mailServer.send(client.getAddresses(), messageContent);
+      } catch (IOException e) {
+         throw new RuntimeException("Error processing input/output", e);
+      }
+   }
+
+   private boolean isFileMode() {
+      return inputFile != null && outputFile != null;
+   }
+
+   private String readFile(String path) throws IOException {
+      StringBuilder content = new StringBuilder();
+      try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+         String line;
+         while ((line = reader.readLine()) != null) {
+            content.append(line).append("\n");
+         }
+      }
+      return content.toString().trim();
+   }
+
+   private void writeFile(String path, String content) throws IOException {
+      try (FileWriter writer = new FileWriter(path)) {
+         writer.write(content);
+      }
+   }
 }
