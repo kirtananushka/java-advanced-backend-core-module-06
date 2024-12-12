@@ -2,6 +2,8 @@ package com.epam.ld.module2.testing.template;
 
 import com.epam.ld.module2.testing.Client;
 
+import java.util.Map;
+
 /**
  * The type Template engine.
  */
@@ -14,6 +16,11 @@ public class TemplateEngine {
      * @return the string
      */
     public String generateMessage(Template template, Client client) {
-        return null;
+        String result = template.getTemplateText();
+        for (Map.Entry<String, String> entry : template.getVariables().entrySet()) {
+            String placeholder = "#{" + entry.getKey() + "}";
+            result = result.replace(placeholder, entry.getValue());
+        }
+        return result;
     }
 }
