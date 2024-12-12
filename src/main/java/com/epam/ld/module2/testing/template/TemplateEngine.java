@@ -2,6 +2,7 @@ package com.epam.ld.module2.testing.template;
 
 import com.epam.ld.module2.testing.Client;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -14,7 +15,12 @@ public class TemplateEngine {
    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("#\\{([^}]+)}");
 
    public String generateMessage(Template template, Client client) {
-      Set<String> placeholders = extractPlaceholders(template.getTemplateText());
+      String templateText = new String(
+            template.getTemplateText().getBytes(StandardCharsets.ISO_8859_1),
+            StandardCharsets.ISO_8859_1
+      );
+
+      Set<String> placeholders = extractPlaceholders(templateText);
       validatePlaceholders(placeholders, template);
 
       Set<String> runtimeTags = new HashSet<>();
@@ -25,10 +31,10 @@ public class TemplateEngine {
          }
       }
 
-      String result = template.getTemplateText();
+      String result = templateText;
       for (String placeholder : placeholders) {
          if (!runtimeTags.contains(placeholder)) {
-            String value = template.getVariables().get(placeholder);
+            String value = ensureLatin1Encoding(template.getVariables().get(placeholder));
             result = result.replace("#{" + placeholder + "}", value);
          }
       }
@@ -39,6 +45,10 @@ public class TemplateEngine {
       }
 
       return result;
+   }
+
+   private String ensureLatin1Encoding(String text) {
+      return new String(text.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1);
    }
 
    private Set<String> extractPlaceholders(String template) {

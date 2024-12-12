@@ -151,4 +151,64 @@ class TemplateEngineTest {
       assertEquals("Value is: final", result,
             "Should properly handle chained template processing");
    }
+
+   @Test
+   void shouldSupportLatin1CharactersInTemplate() {
+      // Given
+      Template template = new Template("¡Hola #{name}! Código: #{code}");
+      template.addVariable("name", "José");
+      template.addVariable("code", "123");
+
+      // When
+      String result = engine.generateMessage(template, null);
+
+      // Then
+      assertEquals("¡Hola José! Código: 123", result,
+            "Should properly handle Latin-1 characters in template");
+   }
+
+   @Test
+   void shouldSupportLatin1CharactersInVariables() {
+      // Given
+      Template template = new Template("Message: #{message}");
+      template.addVariable("message", "Café avec crème et pâté");
+
+      // When
+      String result = engine.generateMessage(template, null);
+
+      // Then
+      assertEquals("Message: Café avec crème et pâté", result,
+            "Should properly handle Latin-1 characters in variable values");
+   }
+
+   @Test
+   void shouldSupportMixedLatin1AndRuntimeTags() {
+      // Given
+      Template template = new Template("#{greeting} señor #{name}! #{tagline}");
+      template.addVariable("greeting", "¡Hola");
+      template.addVariable("name", "González");
+      template.addVariable("tagline", "#{custom_tag}");
+
+      // When
+      String result = engine.generateMessage(template, null);
+
+      // Then
+      assertEquals("¡Hola señor González! #{custom_tag}", result,
+            "Should handle Latin-1 characters with runtime tags");
+   }
+
+   @Test
+   void shouldSupportFullLatin1CharacterSet() {
+      // Given
+      String latin1Chars = "¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ";
+      Template template = new Template("Special: #{chars}");
+      template.addVariable("chars", latin1Chars);
+
+      // When
+      String result = engine.generateMessage(template, null);
+
+      // Then
+      assertEquals("Special: " + latin1Chars, result,
+            "Should support all Latin-1 special characters");
+   }
 }
