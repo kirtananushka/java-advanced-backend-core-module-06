@@ -14,16 +14,26 @@ public class TemplateEngine {
    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("#\\{([^}]+)}");
 
    public String generateMessage(Template template, Client client) {
-      Set<String> requiredPlaceholders = extractPlaceholders(template.getTemplateText());
+      Set<String> placeholders = extractPlaceholders(template.getTemplateText());
+      validatePlaceholders(placeholders, template);
 
-      for (String placeholder : requiredPlaceholders) {
-         if (!template.getVariables().containsKey(placeholder)) {
-            throw new IllegalArgumentException("Missing value for placeholder: " + placeholder);
+      Set<String> runtimeTags = new HashSet<>();
+      for (String placeholder : placeholders) {
+         String value = template.getVariables().get(placeholder);
+         if (isRuntimeTag(value)) {
+            runtimeTags.add(placeholder);
          }
       }
 
       String result = template.getTemplateText();
-      for (String placeholder : requiredPlaceholders) {
+      for (String placeholder : placeholders) {
+         if (!runtimeTags.contains(placeholder)) {
+            String value = template.getVariables().get(placeholder);
+            result = result.replace("#{" + placeholder + "}", value);
+         }
+      }
+
+      for (String placeholder : runtimeTags) {
          String value = template.getVariables().get(placeholder);
          result = result.replace("#{" + placeholder + "}", value);
       }
@@ -38,5 +48,19 @@ public class TemplateEngine {
          placeholders.add(matcher.group(1));
       }
       return placeholders;
+   }
+
+   private void validatePlaceholders(Set<String> required, Template template) {
+      for (String placeholder : required) {
+         if (!template.getVariables().containsKey(placeholder)) {
+            throw new IllegalArgumentException("Missing value for placeholder: " + placeholder);
+         }
+      }
+   }
+
+   private boolean isRuntimeTag(String value) {
+      if (value == null) return false;
+      Matcher matcher = PLACEHOLDER_PATTERN.matcher(value);
+      return matcher.matches() || value.contains("#{") && value.contains("}");
    }
 }

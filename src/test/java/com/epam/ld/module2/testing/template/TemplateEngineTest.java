@@ -66,4 +66,89 @@ class TemplateEngineTest {
       assertEquals(result, secondResult,
             "Adding more extra variables should not affect the result");
    }
+
+   @Test
+   void shouldSupportRuntimeTagValues() {
+      // Given
+      Template template = new Template("Hello #{name}! Your tag is #{tag}, but not #{escaped}");
+      template.addVariable("name", "John");
+      template.addVariable("tag", "#{runtimeTag}");
+      template.addVariable("escaped", "\\#{notATag}");  // Testing escaped sequence
+
+      // When
+      String result = engine.generateMessage(template, null);
+
+      // Then
+      assertEquals("Hello John! Your tag is #{runtimeTag}, but not \\#{notATag}", result,
+            "Should preserve #{...} format in variable values and handle escaped sequences");
+   }
+
+   @Test
+   void shouldSupportNestedRuntimeTagValues() {
+      // Given
+      Template template = new Template("Tags: #{tag1} -> #{tag2}");
+      template.addVariable("tag1", "#{runtime1}");
+      template.addVariable("tag2", "Value with #{nested}");
+
+      // When
+      String result = engine.generateMessage(template, null);
+
+      // Then
+      assertEquals("Tags: #{runtime1} -> Value with #{nested}", result,
+            "Should handle #{...} values in different contexts");
+   }
+
+   @Test
+   void shouldPreserveRuntimeTagsInVariableValues() {
+      // Given
+      Template template = new Template("#{prefix} #{content} #{suffix}");
+      template.addVariable("prefix", "Start:");
+      template.addVariable("content", "#{dynamicContent}");
+      template.addVariable("suffix", "#{dynamicEnd}");
+
+      // When
+      String result = engine.generateMessage(template, null);
+
+      // Then
+      assertEquals("Start: #{dynamicContent} #{dynamicEnd}", result,
+            "Should correctly handle mix of regular and runtime tag values");
+   }
+
+   @Test
+   void shouldPreserveRuntimeTagAndReplaceNormal() {
+      // Given
+      Template template = new Template("Value is: #{value}");
+      template.addVariable("value", "#{tag}");
+
+      Template template2 = new Template("Prefix #{value} #{tag}");
+      template2.addVariable("value", "Test");
+      template2.addVariable("tag", "Success");
+
+      // When
+      String firstResult = engine.generateMessage(template, null);
+      String secondResult = engine.generateMessage(template2, null);
+
+      // Then
+      assertEquals("Value is: #{tag}", firstResult,
+            "First template should preserve the #{tag}");
+      assertEquals("Prefix Test Success", secondResult,
+            "Second template should replace both placeholders normally");
+   }
+
+   @Test
+   void shouldChainRuntimeTagProcessing() {
+      // Given
+      Template template1 = new Template("Value is: #{value}");
+      template1.addVariable("value", "#{nextTag}");
+
+      Template template2 = new Template(engine.generateMessage(template1, null));
+      template2.addVariable("nextTag", "final");
+
+      // When
+      String result = engine.generateMessage(template2, null);
+
+      // Then
+      assertEquals("Value is: final", result,
+            "Should properly handle chained template processing");
+   }
 }
