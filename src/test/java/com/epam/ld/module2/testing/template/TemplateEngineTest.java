@@ -2,6 +2,11 @@ package com.epam.ld.module2.testing.template;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -210,5 +215,29 @@ class TemplateEngineTest {
       // Then
       assertEquals("Special: " + latin1Chars, result,
             "Should support all Latin-1 special characters");
+   }
+
+   static Stream<Arguments> provideTemplateTestCases() {
+      return Stream.of(
+            Arguments.of("Hello, #{name}!", "name", "John", "Hello, John!"),
+            Arguments.of("No variables here", "any", "value", "No variables here"),
+            Arguments.of("#{tag} is #{tag}", "tag", "repeated", "repeated is repeated")
+      );
+   }
+
+   @ParameterizedTest(name = "Test #{index}: Template={0}, Expected={2}")
+   @MethodSource("provideTemplateTestCases")
+   void shouldProcessDifferentTemplates(String templateText, String varName,
+                                        String varValue, String expected) {
+      // Given
+      Template template = new Template(templateText);
+      template.addVariable(varName, varValue);
+      TemplateEngine templateEngine = new TemplateEngine();
+
+      // When
+      String result = templateEngine.generateMessage(template, null);
+
+      // Then
+      assertEquals(expected, result);
    }
 }
