@@ -65,7 +65,7 @@ spotbugsMain {
 
 pmd {
     ignoreFailures = true
-    pmdTest.enabled = false
+    pmdTest.enabled = true
     ruleSets = [
             'java-basic',
             'java-braces',

@@ -4,8 +4,11 @@ import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 
 public class TestExecutionLogger implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
@@ -24,8 +27,13 @@ public class TestExecutionLogger implements BeforeTestExecutionCallback, AfterTe
    }
 
    private void logMessage(String message) {
-      try (FileWriter writer = new FileWriter(LOG_FILE, true)) {
-         writer.write(message + "\n");
+      try {
+         Files.write(
+               Paths.get(LOG_FILE),
+               (message + "\n").getBytes(StandardCharsets.UTF_8),
+               StandardOpenOption.CREATE,
+               StandardOpenOption.APPEND
+         );
       } catch (IOException e) {
          System.err.println("Failed to write to log file: " + e.getMessage());
       }

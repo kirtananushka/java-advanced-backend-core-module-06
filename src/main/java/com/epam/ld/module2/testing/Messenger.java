@@ -4,10 +4,14 @@ import com.epam.ld.module2.testing.template.Template;
 import com.epam.ld.module2.testing.template.TemplateEngine;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 
 /**
  * The type Messenger.
@@ -57,11 +61,15 @@ public class Messenger {
             messageContent = templateEngine.generateMessage(template, client);
             writeFile(outputFile, messageContent);
          } else {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            try (BufferedReader reader = new BufferedReader(
+                  new InputStreamReader(System.in, StandardCharsets.UTF_8))) {
                input = reader.readLine();
                template.addVariable("input", input);
                messageContent = templateEngine.generateMessage(template, client);
-               System.out.println(messageContent);
+               try (PrintWriter writer = new PrintWriter(
+                     new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true)) {
+                  writer.println(messageContent);
+               }
             }
          }
 
@@ -77,7 +85,8 @@ public class Messenger {
 
    String readFile(String path) throws IOException {
       StringBuilder content = new StringBuilder();
-      try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+      try (BufferedReader reader = new BufferedReader(
+            new InputStreamReader(Files.newInputStream(Paths.get(path)), StandardCharsets.UTF_8))) {
          String line;
          while ((line = reader.readLine()) != null) {
             content.append(line).append("\n");
@@ -87,7 +96,8 @@ public class Messenger {
    }
 
    void writeFile(String path, String content) throws IOException {
-      try (FileWriter writer = new FileWriter(path)) {
+      try (OutputStreamWriter writer = new OutputStreamWriter(
+            Files.newOutputStream(Paths.get(path)), StandardCharsets.UTF_8)) {
          writer.write(content);
       }
    }
