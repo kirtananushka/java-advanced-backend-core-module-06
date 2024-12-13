@@ -43,7 +43,7 @@ class MessengerTest {
    }
 
    @Test
-   void shouldSendMessageInConsoleMode() throws IOException {
+   void shouldSendMessageInConsoleMode() {
       String input = "Test input";
       ByteArrayInputStream inStream = new ByteArrayInputStream(input.getBytes());
       ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -126,9 +126,9 @@ class MessengerTest {
 
       // When
       templateSpy.addVariable("value", "test");
-      engine.generateMessage(templateSpy, null);
+      engine.generateMessage(templateSpy, new Client());
 
       verify(templateSpy, times(1)).getTemplateText();
-      verify(templateSpy, times(3)).getVariables();
+      verify(templateSpy, times(4)).getVariables();
    }
 }

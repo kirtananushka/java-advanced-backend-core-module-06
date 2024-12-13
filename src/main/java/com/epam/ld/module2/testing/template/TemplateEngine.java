@@ -61,10 +61,31 @@ public class TemplateEngine {
    }
 
    private void validatePlaceholders(Set<String> required, Template template) {
+      Set<String> missing = new HashSet<>();
       for (String placeholder : required) {
+         validatePlaceholderFormat(placeholder);
          if (!template.getVariables().containsKey(placeholder)) {
-            throw new IllegalArgumentException("Missing value for placeholder: " + placeholder);
+            missing.add(placeholder);
+         } else if (template.getVariables().get(placeholder) == null) {
+            throw new IllegalArgumentException("Null value not allowed for placeholder: " + placeholder);
          }
+      }
+
+      if (!missing.isEmpty()) {
+         throw new IllegalArgumentException("Missing values for placeholders: " +
+               String.join(", ", missing));
+      }
+   }
+
+   private void validatePlaceholderFormat(String placeholder) {
+      if (placeholder == null) {
+         throw new IllegalArgumentException("Invalid placeholder: null name");
+      }
+      if (placeholder.isEmpty()) {
+         throw new IllegalArgumentException("Invalid placeholder: empty name");
+      }
+      if (!placeholder.matches("[a-zA-Z][a-zA-Z0-9]*")) {
+         throw new IllegalArgumentException("Invalid placeholder format: " + placeholder);
       }
    }
 

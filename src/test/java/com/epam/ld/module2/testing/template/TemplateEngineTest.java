@@ -19,6 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -244,10 +245,9 @@ class TemplateEngineTest {
       // Given
       Template template = new Template(templateText);
       template.addVariable(varName, varValue);
-      TemplateEngine templateEngine = new TemplateEngine();
 
       // When
-      String result = templateEngine.generateMessage(template, null);
+      String result = engine.generateMessage(template, null);
 
       // Then
       assertEquals(expected, result);
@@ -256,7 +256,6 @@ class TemplateEngineTest {
    @TestFactory
    @DisplayName("Dynamic tests for template processing")
    Stream<DynamicTest> dynamicTestsForTemplateProcessing() {
-      TemplateEngine templateEngine = new TemplateEngine();
 
       class TestCase {
          private final String name;
@@ -298,7 +297,7 @@ class TemplateEngineTest {
                   () -> {
                      Template template = new Template(testCase.template);
                      template.addVariable(testCase.varName, testCase.varValue);
-                     String result = templateEngine.generateMessage(template, null);
+                     String result = engine.generateMessage(template, null);
                      assertEquals(testCase.expected, result);
                   }
             ));
@@ -308,8 +307,7 @@ class TemplateEngineTest {
    void shouldHandleCustomAnnotatedTest() {
       Template template = new Template("#{value}");
       template.addVariable("value", "test");
-      TemplateEngine templateEngine = new TemplateEngine();
-      assertEquals("test", templateEngine.generateMessage(template, null));
+      assertEquals("test", engine.generateMessage(template, null));
    }
 
    @Target(ElementType.METHOD)
@@ -324,7 +322,59 @@ class TemplateEngineTest {
    void shouldSkipInProduction() {
       Template template = new Template("Test #{env}");
       template.addVariable("env", "development");
-      TemplateEngine templateEngine = new TemplateEngine();
-      assertEquals("Test development", templateEngine.generateMessage(template, null));
-   }   
+      assertEquals("Test development", engine.generateMessage(template, null));
+   }
+
+   @Test
+   void shouldThrowExceptionWithProperMessageForMissingPlaceholder() {
+      // Given
+      Template template = new Template("Hello, #{firstName} #{lastName}!");
+      template.addVariable("firstName", "John");
+
+      // When & Then
+      Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+         engine.generateMessage(template, null);
+      });
+
+      assertAll(
+            "Exception validation",
+            () -> assertTrue(exception.getMessage().contains("lastName"),
+                  "Message should mention missing placeholder"),
+            () -> assertEquals(IllegalArgumentException.class, exception.getClass(),
+                  "Should be IllegalArgumentException")
+      );
+   }
+
+   @Test
+   void shouldThrowExceptionForMultipleMissingPlaceholders() {
+      // Given
+      Template template = new Template("#{greeting} #{name}! Your order #{orderId} is #{status}");
+      template.addVariable("greeting", "Hello");
+      template.addVariable("name", "John");
+
+      // When & Then
+      IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> engine.generateMessage(template, null)
+      );
+
+      assertAll(
+            "Multiple missing placeholders",
+            () -> assertTrue(exception.getMessage().contains("orderId")),
+            () -> assertTrue(exception.getMessage().contains("status")),
+            () -> assertTrue(exception.getMessage().contains("Missing value"))
+      );
+   }
+
+   @Test
+   void shouldHandleInvalidVariableValues() {
+      // Given
+      Template template = new Template("Test #{value}");
+      template.addVariable("value", null);  // null value
+
+      // When & Then
+      assertThrows(IllegalArgumentException.class,
+            () -> engine.generateMessage(template, null),
+            "Should not accept null values for placeholders");
+   }
 }
