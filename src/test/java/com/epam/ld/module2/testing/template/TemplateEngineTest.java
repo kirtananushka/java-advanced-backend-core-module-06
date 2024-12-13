@@ -1,7 +1,10 @@
 package com.epam.ld.module2.testing.template;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -239,5 +242,56 @@ class TemplateEngineTest {
 
       // Then
       assertEquals(expected, result);
+   }
+
+   @TestFactory
+   @DisplayName("Dynamic tests for template processing")
+   Stream<DynamicTest> dynamicTestsForTemplateProcessing() {
+      TemplateEngine templateEngine = new TemplateEngine();
+
+      class TestCase {
+         private final String name;
+         private final String template;
+         private final String varName;
+         private final String varValue;
+         private final String expected;
+
+         TestCase(String name, String template, String varName,
+                  String varValue, String expected) {
+            this.name = name;
+            this.template = template;
+            this.varName = varName;
+            this.varValue = varValue;
+            this.expected = expected;
+         }
+      }
+
+      TestCase[] testCases = {
+            new TestCase(
+                  "Simple replacement",
+                  "Hello, #{name}",
+                  "name",
+                  "World",
+                  "Hello, World"
+            ),
+            new TestCase(
+                  "Special characters",
+                  "#{symbol}! #{symbol}?",
+                  "symbol",
+                  "@",
+                  "@! @?"
+            )
+      };
+
+      return Stream.of(testCases)
+            .map(testCase -> DynamicTest.dynamicTest(
+                  testCase.name,
+                  () -> {
+                     Template template = new Template(testCase.template);
+                     template.addVariable(testCase.varName, testCase.varValue);
+                     String result = templateEngine.generateMessage(template, null);
+                     assertEquals(testCase.expected, result);
+                  }
+            ));
    }
 }
