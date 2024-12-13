@@ -75,7 +75,7 @@ public class Messenger {
       return inputFile != null && outputFile != null;
    }
 
-   private String readFile(String path) throws IOException {
+   String readFile(String path) throws IOException {
       StringBuilder content = new StringBuilder();
       try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
          String line;
@@ -86,7 +86,7 @@ public class Messenger {
       return content.toString().trim();
    }
 
-   private void writeFile(String path, String content) throws IOException {
+   void writeFile(String path, String content) throws IOException {
       try (FileWriter writer = new FileWriter(path)) {
          writer.write(content);
       }

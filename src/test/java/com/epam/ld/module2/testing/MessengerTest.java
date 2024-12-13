@@ -19,7 +19,13 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -89,5 +95,40 @@ class MessengerTest {
       verify(mailServer).send(client.getAddresses(), "Generated message");
       String outputContent = new String(java.nio.file.Files.readAllBytes(outputFile.toPath()));
       assertEquals("Generated message", outputContent.trim());
+   }
+
+   @Test
+   void shouldInterceptFileOperations() throws IOException {
+      MailServer mockedMailServer = mock(MailServer.class);
+      TemplateEngine mockedTemplateEngine = mock(TemplateEngine.class);
+      Messenger messengerSpy = spy(new Messenger(mockedMailServer, mockedTemplateEngine));
+
+      String generatedContent = "generated content";
+      when(mockedTemplateEngine.generateMessage(any(Template.class), any(Client.class))).thenReturn(generatedContent);
+      doReturn("test content").when(messengerSpy).readFile(anyString());
+      doNothing().when(messengerSpy).writeFile(anyString(), anyString());
+
+      Template template = new Template("test");
+      Client client = new Client();
+      messengerSpy.setIOFiles("input.txt", "output.txt");
+      messengerSpy.sendMessage(client, template);
+
+      verify(messengerSpy).readFile("input.txt");
+      verify(messengerSpy).writeFile("output.txt", generatedContent);
+      verify(mockedTemplateEngine).generateMessage(template, client);
+   }
+
+   @Test
+   void shouldTrackTemplateUsage() {
+      // Given
+      Template templateSpy = spy(new Template("#{value}"));
+      TemplateEngine engine = new TemplateEngine();
+
+      // When
+      templateSpy.addVariable("value", "test");
+      engine.generateMessage(templateSpy, null);
+
+      verify(templateSpy, times(1)).getTemplateText();
+      verify(templateSpy, times(3)).getVariables();
    }
 }
