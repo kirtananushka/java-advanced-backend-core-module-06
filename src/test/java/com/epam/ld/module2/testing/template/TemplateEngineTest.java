@@ -3,12 +3,17 @@ package com.epam.ld.module2.testing.template;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -293,5 +298,20 @@ class TemplateEngineTest {
                      assertEquals(testCase.expected, result);
                   }
             ));
+   }
+
+   @TemplateTest
+   void shouldHandleCustomAnnotatedTest() {
+      Template template = new Template("#{value}");
+      template.addVariable("value", "test");
+      TemplateEngine templateEngine = new TemplateEngine();
+      assertEquals("test", templateEngine.generateMessage(template, null));
+   }
+
+   @Target(ElementType.METHOD)
+   @Retention(RetentionPolicy.RUNTIME)
+   @Tag("template")
+   @Test
+   @interface TemplateTest {
    }
 }
