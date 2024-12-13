@@ -1,9 +1,11 @@
 package com.epam.ld.module2.testing;
 
+import com.epam.ld.module2.testing.extension.TestExecutionLogger;
 import com.epam.ld.module2.testing.template.Template;
 import com.epam.ld.module2.testing.template.TemplateEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.ByteArrayInputStream;
@@ -21,6 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(TestExecutionLogger.class)
 class MessengerTest {
    private MailServer mailServer;
    private TemplateEngine templateEngine;
