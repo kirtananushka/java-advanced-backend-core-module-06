@@ -1,0 +1,50 @@
+Starting test: shouldTrackTemplateUsage() at 2024-12-13T22:08:40.529
+Finished test: shouldTrackTemplateUsage() Status: PASSED at 2024-12-13T22:08:40.592
+Starting test: shouldSendMessageInFileMode(Path) at 2024-12-13T22:08:40.598
+Finished test: shouldSendMessageInFileMode(Path) Status: PASSED at 2024-12-13T22:08:40.613
+Starting test: shouldSendMessageInConsoleMode() at 2024-12-13T22:08:40.620
+Finished test: shouldSendMessageInConsoleMode() Status: PASSED at 2024-12-13T22:08:40.624
+Starting test: shouldInterceptFileOperations() at 2024-12-13T22:08:40.626
+Finished test: shouldInterceptFileOperations() Status: PASSED at 2024-12-13T22:08:40.645
+Starting test: shouldHandleCustomAnnotatedTest() at 2024-12-13T22:08:40.652
+Finished test: shouldHandleCustomAnnotatedTest() Status: PASSED at 2024-12-13T22:08:40.655
+Starting test: shouldHandleInvalidVariableValues() at 2024-12-13T22:08:40.657
+Finished test: shouldHandleInvalidVariableValues() Status: PASSED at 2024-12-13T22:08:40.660
+Starting test: shouldThrowExceptionWhenPlaceholderValueIsMissing() at 2024-12-13T22:08:40.661
+Finished test: shouldThrowExceptionWhenPlaceholderValueIsMissing() Status: PASSED at 2024-12-13T22:08:40.665
+Starting test: Test #1: Template=Hello, #{name}!, Expected=John at 2024-12-13T22:08:40.682
+Finished test: Test #1: Template=Hello, #{name}!, Expected=John Status: PASSED at 2024-12-13T22:08:40.696
+Starting test: Test #2: Template=No variables here, Expected=value at 2024-12-13T22:08:40.700
+Finished test: Test #2: Template=No variables here, Expected=value Status: PASSED at 2024-12-13T22:08:40.702
+Starting test: Test #3: Template=#{tag} is #{tag}, Expected=repeated at 2024-12-13T22:08:40.704
+Finished test: Test #3: Template=#{tag} is #{tag}, Expected=repeated Status: PASSED at 2024-12-13T22:08:40.706
+Starting test: shouldSupportLatin1CharactersInVariables() at 2024-12-13T22:08:40.707
+Finished test: shouldSupportLatin1CharactersInVariables() Status: PASSED at 2024-12-13T22:08:40.709
+Starting test: shouldSupportFullLatin1CharacterSet() at 2024-12-13T22:08:40.711
+Finished test: shouldSupportFullLatin1CharacterSet() Status: PASSED at 2024-12-13T22:08:40.713
+Starting test: shouldThrowExceptionForMultipleMissingPlaceholders() at 2024-12-13T22:08:40.714
+Finished test: shouldThrowExceptionForMultipleMissingPlaceholders() Status: PASSED at 2024-12-13T22:08:40.718
+Starting test: Dynamic tests for template processing at 2024-12-13T22:08:40.719
+Finished test: Dynamic tests for template processing Status: PASSED at 2024-12-13T22:08:40.725
+Starting test: shouldSupportNestedRuntimeTagValues() at 2024-12-13T22:08:40.727
+Finished test: shouldSupportNestedRuntimeTagValues() Status: PASSED at 2024-12-13T22:08:40.731
+Starting test: shouldChainRuntimeTagProcessing() at 2024-12-13T22:08:40.732
+Finished test: shouldChainRuntimeTagProcessing() Status: PASSED at 2024-12-13T22:08:40.735
+Starting test: shouldIgnoreExtraVariables() at 2024-12-13T22:08:40.736
+Finished test: shouldIgnoreExtraVariables() Status: PASSED at 2024-12-13T22:08:40.738
+Starting test: shouldThrowExceptionWithProperMessageForMissingPlaceholder() at 2024-12-13T22:08:40.739
+Finished test: shouldThrowExceptionWithProperMessageForMissingPlaceholder() Status: PASSED at 2024-12-13T22:08:40.742
+Starting test: shouldPreserveRuntimeTagsInVariableValues() at 2024-12-13T22:08:40.743
+Finished test: shouldPreserveRuntimeTagsInVariableValues() Status: PASSED at 2024-12-13T22:08:40.746
+Starting test: shouldSkipInProduction() at 2024-12-13T22:08:40.749
+Finished test: shouldSkipInProduction() Status: PASSED at 2024-12-13T22:08:40.751
+Starting test: shouldSupportMixedLatin1AndRuntimeTags() at 2024-12-13T22:08:40.752
+Finished test: shouldSupportMixedLatin1AndRuntimeTags() Status: PASSED at 2024-12-13T22:08:40.754
+Starting test: shouldSupportRuntimeTagValues() at 2024-12-13T22:08:40.755
+Finished test: shouldSupportRuntimeTagValues() Status: PASSED at 2024-12-13T22:08:40.756
+Starting test: shouldSupportLatin1CharactersInTemplate() at 2024-12-13T22:08:40.758
+Finished test: shouldSupportLatin1CharactersInTemplate() Status: PASSED at 2024-12-13T22:08:40.760
+Starting test: shouldReplaceSinglePlaceholder() at 2024-12-13T22:08:40.762
+Finished test: shouldReplaceSinglePlaceholder() Status: PASSED at 2024-12-13T22:08:40.764
+Starting test: shouldPreserveRuntimeTagAndReplaceNormal() at 2024-12-13T22:08:40.764
+Finished test: shouldPreserveRuntimeTagAndReplaceNormal() Status: PASSED at 2024-12-13T22:08:40.766
